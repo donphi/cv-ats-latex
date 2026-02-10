@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────────
-#  build.sh — compile the CV inside Docker and open the PDF(s)
+#  build.sh — compile the CV / Resume inside Docker and open the PDF(s)
 #
 #  Usage:
 #    ./build.sh          Build both designed + ATS PDFs
@@ -42,17 +42,11 @@ done
 # ── Clean mode ───────────────────────────────────────────────────
 if $CLEAN; then
   echo "Cleaning build artifacts..."
-  rm -f main.{aux,log,out,fls,fdb_latexmk,synctex.gz,pdf}
-  rm -f ats_cv.{aux,log,out,fls,fdb_latexmk,synctex.gz,pdf}
-  rm -f ats_main.{aux,log,out,fls,fdb_latexmk,synctex.gz,tex}
+  rm -f *.aux *.log *.out *.fls *.fdb_latexmk *.synctex.gz *.pdf
+  rm -f ats_main.tex
+  rm -f generated/.build-meta generated/settings.tex
   echo "Done."
   exit 0
-fi
-
-# ── Fonts symlink (preamble.tex expects Path=fonts/) ─────────────
-if [ ! -e fonts ]; then
-  ln -s font/iosevka/typefaces fonts
-  echo "Created symlink: fonts -> font/iosevka/typefaces"
 fi
 
 # ── Set UID/GID for Docker ───────────────────────────────────────
@@ -71,9 +65,15 @@ fi
 
 # ── Compile designed CV ──────────────────────────────────────────
 if $BUILD_DESIGNED; then
-  echo "Compiling designed CV with LuaLaTeX..."
+  echo "Building designed CV (generate + LuaLaTeX)..."
   docker compose run --rm latex
-  PDF_DESIGNED="main.pdf"
+  # Read dynamic output name from build metadata
+  if [ -f "generated/.build-meta" ]; then
+    source generated/.build-meta
+    PDF_DESIGNED="${OUTPUT_NAME}-${OUTPUT_TYPE}.pdf"
+  else
+    PDF_DESIGNED="cv.pdf"
+  fi
   if [ -f "$PDF_DESIGNED" ]; then
     echo "Output: $(pwd)/$PDF_DESIGNED"
   else
@@ -82,14 +82,16 @@ if $BUILD_DESIGNED; then
   fi
 fi
 
-# ── Generate + compile ATS CV ────────────────────────────────────
+# ── Compile ATS CV ───────────────────────────────────────────────
 if $BUILD_ATS; then
-  echo "Generating ATS LaTeX from text files..."
-  python3 scripts/generate_ats.py
-
-  echo "Compiling ATS CV with pdfLaTeX..."
+  echo "Building ATS CV (generate + pdfLaTeX)..."
   docker compose -f docker-compose.ats.yml run --rm latex-ats
-  PDF_ATS="ats_cv.pdf"
+  if [ -f "generated/.build-meta" ]; then
+    source generated/.build-meta
+    PDF_ATS="${OUTPUT_NAME}-${OUTPUT_TYPE}-ats.pdf"
+  else
+    PDF_ATS="cv-ats.pdf"
+  fi
   if [ -f "$PDF_ATS" ]; then
     echo "Output: $(pwd)/$PDF_ATS"
   else
@@ -109,9 +111,9 @@ open_pdf() {
   fi
 }
 
-if $BUILD_DESIGNED && [ -f "main.pdf" ]; then
-  open_pdf "main.pdf"
+if $BUILD_DESIGNED && [ -n "${PDF_DESIGNED:-}" ] && [ -f "${PDF_DESIGNED:-}" ]; then
+  open_pdf "$PDF_DESIGNED"
 fi
-if $BUILD_ATS && [ -f "ats_cv.pdf" ]; then
-  open_pdf "ats_cv.pdf"
+if $BUILD_ATS && [ -n "${PDF_ATS:-}" ] && [ -f "${PDF_ATS:-}" ]; then
+  open_pdf "$PDF_ATS"
 fi

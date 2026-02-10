@@ -1,4 +1,4 @@
 # Keep the build context as small as possible.
-# Nothing is COPYed into the image — everything is bind-mounted at runtime.
+# Everything is bind-mounted at runtime — nothing is COPYed.
 *
 !Dockerfile

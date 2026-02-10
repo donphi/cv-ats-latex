@@ -1,0 +1,47 @@
+# ──────────────────────────────────────────────────────────────────
+# EDUCATION — degrees, courses, assessments
+# ──────────────────────────────────────────────────────────────────
+# progress: 0–100 integer; shows a progress bar in the designed CV.
+#           Omit or set to null if not applicable.
+# details:  shown as italic text (ATS) or progress-bar label (designed).
+#           Omit if not applicable.
+
+entries:
+  - degree: "MSc AI and Digital Health"
+    institution: "University of Westminster"
+    dates: "2024 -- 2026"
+    location: "London, UK"
+    details: "First-class ~78% avg"
+    progress: 78
+
+  - degree: "Executive Assessment"
+    institution: "Wharton / Duke EMBA"
+    dates: "2023"
+    location: ""
+    details: "Score: 153 (IR 11, VR 10, QR 12)"
+
+  - degree: "Statistics & Calculus I"
+    institution: "Outliers.org Online"
+    dates: "2023 -- 2024"
+    location: "NYC, US"
+    details: "Statistics 95%"
+    progress: 95
+
+  - degree: "The Credential of Readiness"
+    institution: "Harvard Business School Online"
+    dates: "2022"
+    location: ""
+    details: ""
+
+  - degree: "Corporate Finance"
+    institution: "NYU Stern (Aswath Damodaran)"
+    dates: "2020"
+    location: "NYC, US"
+    details: "Perfect 100%"
+    progress: 100
+
+  - degree: "NQF 6: Product Design"
+    institution: "Cape Peninsula University of Technology"
+    dates: "2005 -- 2009"
+    location: "Cape Town, RSA"
+    details: "Design Indaba Fab Lab: Innovation in Lighting"

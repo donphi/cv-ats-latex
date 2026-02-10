@@ -1,0 +1,42 @@
+# ──────────────────────────────────────────────────────────────────
+# TECHNICAL SKILLS — grouped by category
+# ──────────────────────────────────────────────────────────────────
+# Each item in 'items' becomes one line in the designed CV's skill list.
+# For the ATS CV, all items are joined with ", " into a single line.
+
+groups:
+  - category: "GPU / Compute"
+    items:
+      - "NVIDIA B200, RTX 6000 Pro"
+      - "Multi-GPU Parallelism, Polars"
+      - "DuckDB, FAISS, vLLM"
+
+  - category: "ML & NLP"
+    items:
+      - "PyTorch, HF Transformers"
+      - "Sentence-Transformers, SapBERT"
+      - "SHAP, Lifelines, Scikit-learn"
+
+  - category: "Pipelines"
+    items:
+      - "Docker, Prefect, RabbitMQ"
+      - "Distributed worker patterns, CI/CD"
+      - "181 Container Workflows"
+
+  - category: "Multimodal"
+    items:
+      - "Docling, Surya, PaddleOCR"
+      - "High-throughput PDF-to-JSON"
+      - "Token-Spine Alignment"
+
+  - category: "Healthcare"
+    items:
+      - "UK Biobank, DNA Nexus"
+      - "MONDO, HPO, EFO Ontologies"
+      - "Biomarkers, Polygenic Scores"
+
+  - category: "Performance"
+    items:
+      - "System profiling (sysstat/SAR)"
+      - "GPU utilisation management"
+      - "Resource contention, throughput"

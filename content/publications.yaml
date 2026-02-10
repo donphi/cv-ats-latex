@@ -1,0 +1,29 @@
+# ──────────────────────────────────────────────────────────────────
+# PUBLICATIONS — academic papers, articles, patents, etc.
+# ──────────────────────────────────────────────────────────────────
+# Leave entries as [] to omit this section from both CVs entirely.
+#
+# To add publications, replace [] with a list like this:
+#
+# entries:
+#   - authors: "Philp, D., Smith, J., & Lee, K."
+#     title: "Scalable Transformer Architectures for Document Understanding"
+#     venue: "NeurIPS 2025"
+#     year: "2025"
+#
+#   - authors: "Philp, D. & Patel, R."
+#     title: "Retrieval-Augmented Generation for Enterprise Knowledge Bases"
+#     venue: "Proceedings of ACL"
+#     year: "2024"
+#
+#   - authors: "Philp, D."
+#     title: "Patent: Method for Adaptive Layout Generation (US 11,234,567)"
+#     venue: "United States Patent and Trademark Office"
+#     year: "2023"
+#
+#   - authors: "Philp, D., Garcia, M., & Chen, W."
+#     title: "Zero-Shot Cross-Lingual Transfer in Low-Resource Settings"
+#     venue: "EMNLP Findings"
+#     year: "2023"
+
+entries: []

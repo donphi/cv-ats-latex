@@ -1,0 +1,52 @@
+# ──────────────────────────────────────────────────────────────────
+# WORK EXPERIENCE — professional roles
+# ──────────────────────────────────────────────────────────────────
+# Dates  : "Mon YYYY -- Mon YYYY" (e.g. "Mar 2023 -- Feb 2024")
+# Bullets: plain text; & $ % # _ ~ are auto-escaped for LaTeX.
+#          Use --- for em-dash, -- for en-dash.
+
+entries:
+  - role: "Chief Operating Officer & Board Member"
+    company: "Rootstock Investment Management"
+    dates: "Mar 2023 -- Feb 2024"
+    location: "Remote (London, UK)"
+    bullets:
+      - "Owned operating model across technology, governance, and analytics in a regulated, high-accountability investment environment"
+      - "Directed delivery of automated research and reporting workflows; improved reliability of operational processes and controls"
+      - "Oversaw risk and governance tooling, ensuring consistent process execution and auditability across teams"
+
+  - role: "Career Break -- Organ Transplant & Recovery"
+    company: "Hospital of the University of Pennsylvania"
+    dates: "Feb 2019 -- Mar 2023"
+    location: "Philadelphia, USA"
+    bullets:
+      - "Became the 141st person globally to receive a combined double-lung and liver transplant---a 16-hour surgical procedure requiring a two-year pre-transplant wait during peak COVID-19, compared to a typical wait of three to six months"
+      - "Navigated the entire US healthcare system independently as a foreign national, systematically analysing policy, administrative process, and insurance structures to identify a viable coverage pathway"
+      - "Endured 38 years of chronic illness prior to transplant. The same persistence and systems-level problem-solving demonstrated throughout this CV was forged under those conditions"
+
+  - role: "Senior Partner / Project Officer"
+    company: "Rootstock Investment Management"
+    dates: "Jan 2014 -- Feb 2019"
+    location: "Stellenbosch, South Africa"
+    bullets:
+      - "Delivered the firm's core reporting and data platform (~$2.1M budget): authored complete technical specifications from raw data capture through processing logic to portal and report outputs---the first platform of its kind in South Africa's boutique investment sector"
+      - "Built foundational IT and reporting infrastructure: automated analytics, real-time dashboards, and operational monitoring designed for reliability and business continuity"
+      - "Directed a 7,000 sq ft European office expansion across engineering, architecture, and IT; identified and corrected design and implementation failures from the architect, interior designer, and IT manager before build"
+      - "Managed multidisciplinary teams, consistently driving system reliability and data integrity as primary operational requirements"
+
+  - role: "Co-Founder & Project Manager"
+    company: "FundCo"
+    dates: "Jun 2017 -- Feb 2019"
+    location: "Stellenbosch, South Africa"
+    bullets:
+      - "Raised $1M seed funding and led an 8-person development team from specification through to deployment of a financial comparison platform"
+      - "Wrote complete technical specifications and managed delivery against scope, cost, and timeline---delivered under budget and ahead of schedule"
+
+  - role: "Technical Analyst / Systems Lead"
+    company: "Rootstock Investment Management"
+    dates: "Oct 2008 -- Jan 2014"
+    location: "Stellenbosch, South Africa"
+    bullets:
+      - "Founding team member; contributed to scaling the company from 3 to 25 staff and became a shareholder through sustained strategic and operational contributions"
+      - "Built systematic analysis frameworks for FX and multi-asset strategies producing consistent returns over an 11-year track record"
+      - "Designed all business continuity and disaster recovery plans; built the firm's foundational IT and reporting infrastructure from zero"

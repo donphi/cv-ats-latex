@@ -12,9 +12,9 @@
 %   \LeftBoxInit{0}{\ContentStartY}
 %
 % USAGE:
-%   \LeftBox{SECTION TITLE}{components/your-content.tex}
+%   \LeftBox{SECTION TITLE}{generated/your-content.tex}
 %   \LeftBoxGap{1}
-%   \LeftBox{NEXT TITLE}{components/next-content.tex}
+%   \LeftBox{NEXT TITLE}{generated/next-content.tex}
 %
 % HOW IT WORKS:
 %   - Box origin (0,0) is TOP-LEFT corner of the drawable area
@@ -54,7 +54,7 @@
 %
 \newcommand{\LeftBox}[2]{%
     % #1 = TITLE (appears in top border)
-    % #2 = content file path (e.g., components/summary.tex)
+    % #2 = content file path (e.g., generated/summary.tex)
     %
     % =========================================================================
     % STEP 1: MEASURE CONTENT HEIGHT

@@ -12,9 +12,9 @@ All CV content already exists in the designed CV's component files. The ATS vers
 
 ### Component File Location
 
-All source files are in `components/*.tex`. Each file contains one CV section with its own formatting (custom commands, decorative packages, multi-column layouts, etc.). The ATS conversion must:
+All source files are in `content/*.yaml`. Each file contains one CV section with its own formatting (custom commands, decorative packages, multi-column layouts, etc.). The ATS conversion must:
 
-1. **Read** each `components/*.tex` file
+1. **Read** each `content/*.yaml` file
 2. **Extract** the raw content (text, dates, job titles, bullet points, skills, etc.)
 3. **Reformat** that content into the ATS-safe structure defined below — stripping all custom commands, decorative packages, and non-standard layouts
 4. **Assemble** the reformatted sections into a single `main-ats.tex` file (or equivalent) using only the packages and structure permitted by this spec
@@ -23,19 +23,19 @@ All source files are in `components/*.tex`. Each file contains one CV section wi
 
 | Component File | ATS Section Heading | Conversion Notes |
 |---|---|---|
-| `components/summary.tex` | `PROFESSIONAL SUMMARY` | Strip any custom formatting. Output as plain paragraph text, no bullets. |
-| `components/research_experience.tex` | `RESEARCH EXPERIENCE` | Reformat to Title / Institution / Location / Dates + `\itemize` bullets. Strip any custom commands, decorative elements, or multi-column layouts. |
-| `components/work_experience.tex` | `WORK EXPERIENCE` | Same format as RESEARCH EXPERIENCE. Preserve reverse chronological order. |
-| `components/skills.tex` | `SKILLS` | Convert to `\textbf{Category:}` followed by comma-separated plain text. Remove any progress bars, grids, ratings, or visual skill indicators. Enforce acronym expansion on first use per subheading. |
-| `components/education.tex` | `EDUCATION` | Reformat to Degree / Institution / Location / Dates. Strip any decorative elements. |
-| `components/publications.tex` | `PUBLICATIONS` | Convert to plain-text citation format. Strip any custom bibliography commands or `biblatex` formatting. |
-| `components/certifications.tex` | `CERTIFICATIONS` | Convert to `\textbf{Name}` — Issuer, Year. Strip any decorative elements. |
+| `generated/summary.tex` | `PROFESSIONAL SUMMARY` | Strip any custom formatting. Output as plain paragraph text, no bullets. |
+| `generated/research_experience.tex` | `RESEARCH EXPERIENCE` | Reformat to Title / Institution / Location / Dates + `\itemize` bullets. Strip any custom commands, decorative elements, or multi-column layouts. |
+| `generated/work_experience.tex` | `WORK EXPERIENCE` | Same format as RESEARCH EXPERIENCE. Preserve reverse chronological order. |
+| `generated/skills.tex` | `SKILLS` | Convert to `\textbf{Category:}` followed by comma-separated plain text. Remove any progress bars, grids, ratings, or visual skill indicators. Enforce acronym expansion on first use per subheading. |
+| `generated/education.tex` | `EDUCATION` | Reformat to Degree / Institution / Location / Dates. Strip any decorative elements. |
+| `generated/publications.tex` | `PUBLICATIONS` | Convert to plain-text citation format. Strip any custom bibliography commands or `biblatex` formatting. |
+| `generated/certifications.tex` | `CERTIFICATIONS` | Convert to `\textbf{Name}` — Issuer, Year. Strip any decorative elements. |
 
 If a component file does not exist (e.g., `publications.tex` has not been created yet), omit that section from the ATS output entirely. Do not generate placeholder content.
 
 ### Critical Conversion Rule
 
-The bot's job is **format conversion only**. The content in `components/*.tex` is the single source of truth. The ATS version must contain **exactly the same information** — same job titles, same dates, same bullet points, same skills — just reformatted into the ATS-safe structure. No content should be added, removed, reworded, or "improved" during conversion unless explicitly instructed.
+The bot's job is **format conversion only**. The content in `content/*.yaml` is the single source of truth. The ATS version must contain **exactly the same information** — same job titles, same dates, same bullet points, same skills — just reformatted into the ATS-safe structure. No content should be added, removed, reworded, or "improved" during conversion unless explicitly instructed.
 
 ---
 
@@ -130,7 +130,7 @@ Include a brief note:
 - `soul` / `ulem` — decorative text effects (strikethrough, underline, letter spacing)
 - `setspace` with extreme values — unusual line spacing confuses line-grouping algorithms
 - Custom `.sty` files with non-standard commands
-- Any package imported by a `components/*.tex` file that is not in the permitted list above — the ATS version uses **only** the packages defined in the Recommended Minimal Preamble section
+- Any package imported by a `content/*.yaml` file that is not in the permitted list above — the ATS version uses **only** the packages defined in the Recommended Minimal Preamble section
 
 ### Structural Prohibitions
 - **No columns** — everything single column, full page width
@@ -145,7 +145,7 @@ Include a brief note:
 - **No blank lines used as spacing** — use `\vspace{}` sparingly. Blank vertical space in the PDF can cause parsers to split content into separate sections incorrectly
 - **No justified text** — use `\raggedright`. Justified text inserts variable word spacing that some parsers misread as multiple spaces or missing characters
 - **No `\titlerule` or decorative lines under headings** — horizontal rules rendered via `\titlerule`, `\rule`, or `\hrule` under section headings are decorative elements. While they render as PDF graphic objects (not text) and are unlikely to cause parsing failures, they contradict the principle of zero decoration in the ATS version. The designed CV handles visual hierarchy. This version does not.
-- **No `\input{}` or `\include{}`** — the ATS version must be a single self-contained `.tex` file. Do not import the `components/*.tex` files directly. Their content is extracted and reformatted into this file during conversion.
+- **No `\input{}` or `\include{}`** — the ATS version must be a single self-contained `.tex` file. Do not import the `content/*.yaml` files directly. Their content is extracted and reformatted into this file during conversion.
 
 ---
 
@@ -191,15 +191,15 @@ email@example.com \quad +44 XXX XXX XXXX \quad London, UK\\[2pt]
 \bigskip
 
 % === SECTIONS ===
-% Content below is extracted and reformatted from components/*.tex
+% Content below is extracted and reformatted from content/*.yaml
 % Do not modify content — format conversion only
 
 \section{PROFESSIONAL SUMMARY}
-% Source: components/summary.tex
+% Source: generated/summary.tex
 Two to three sentences. Plain text. No bullet points here.
 
 \section{RESEARCH EXPERIENCE}
-% Source: components/research.tex
+% Source: generated/research.tex
 
 \textbf{Research Title or Role} \hfill Mon Year -- Mon Year\\
 Institution Name \hfill City, Country
@@ -209,7 +209,7 @@ Institution Name \hfill City, Country
 \end{itemize}
 
 \section{WORK EXPERIENCE}
-% Source: components/experience.tex
+% Source: generated/experience.tex
 
 \textbf{Job Title} \hfill Mon Year -- Present\\
 Company Name \hfill City, Country
@@ -219,7 +219,7 @@ Company Name \hfill City, Country
 \end{itemize}
 
 \section{SKILLS}
-% Source: components/skills.tex
+% Source: generated/skills.tex
 
 \textbf{Languages:} Python, Structured Query Language (SQL), R\\
 \textbf{Frameworks:} PyTorch, TensorFlow, Hugging Face Transformers\\
@@ -227,20 +227,20 @@ Company Name \hfill City, Country
 \textbf{Domains:} Natural Language Processing (NLP), Computer Vision (CV), Optical Character Recognition (OCR)
 
 \section{EDUCATION}
-% Source: components/education.tex
+% Source: generated/education.tex
 
 \textbf{Degree Title} \hfill Year -- Year\\
 Institution Name \hfill City, Country
 
 \section{PUBLICATIONS}
-% Source: components/publications.tex
-% Omit this section entirely if components/publications.tex does not exist
+% Source: generated/publications.tex
+% Omit this section entirely if generated/publications.tex does not exist
 
 Author(s). \textit{Title}. Venue/Journal, Year.
 
 \section{CERTIFICATIONS}
-% Source: components/certifications.tex
-% Omit this section entirely if components/certifications.tex does not exist
+% Source: generated/certifications.tex
+% Omit this section entirely if generated/certifications.tex does not exist
 
 \textbf{Certification Name} — Issuing Body \hfill Year
 
@@ -271,4 +271,4 @@ After conversion, diff the text content of the ATS version against the designed 
 
 The ATS version is a **data entry document**. Its job is to make your content findable in a recruiter's keyword search. Every structural decision should serve that single goal. The designed version — linked from within this document — is where your visual identity, layout craft, and design thinking live.
 
-Two documents. Two purposes. One set of content. One source of truth: `components/*.tex`.
+Two documents. Two purposes. One set of content. One source of truth: `content/*.yaml`.

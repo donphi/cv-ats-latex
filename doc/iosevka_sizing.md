@@ -9,9 +9,9 @@ and the master config in `preamble.tex`.
 
 | File | Role |
 |------|------|
-| `font/iosevka/parameters/parameters.toml` | Master font metrics: UPM, leading, cap height, spacing mode |
-| `font/iosevka/parameters/shape-width.toml` | Width grades: maps variant names to advance-width values |
-| `font/iosevka/parameters/variants.toml` | Character shape variants (does not affect grid sizing) |
+| `fonts/iosevka/parameters/parameters.toml` | Master font metrics: UPM, leading, cap height, spacing mode |
+| `fonts/iosevka/parameters/shape-width.toml` | Width grades: maps variant names to advance-width values |
+| `fonts/iosevka/parameters/variants.toml` | Character shape variants (does not affect grid sizing) |
 | `preamble.tex` (§1–§2) | Page size, margins, grid engine |
 | `preamble.tex` (§6) | Box geometry: column widths, gaps, padding |
 
@@ -118,14 +118,35 @@ The default **96 × 85** (min = 13.5) is highlighted. It gives ~13.56 mm
 symmetric margins — a comfortable, professional margin that maximises the
 grid area (96 columns, 85 rows) while keeping the document well-framed.
 
+### Symmetric Sweet Spots (Letter, 9 pt, MonoWidthRatio 0.6)
+
+Letter (8.5 × 11 in / 215.9 × 279.4 mm) has its own set of sweet spots.
+The same cell size applies; only the page dimensions differ. Margins are
+shown in inches (the `margin` YAML value is still in mm).
+
+| Grid | MarginH (in) | MarginV (in) | |H−V| (in) | Safe min (mm) | Draw area |
+|------|-------------|-------------|------------|----------------|-----------|
+| 110 × 86 | 0.125 | 0.125 | 0.000 | 3.1 | 94.9% |
+| 105 × 83 | 0.312 | 0.312 | 0.000 | 7.9 | 87.4% |
+| **100 × 80** | **0.500** | **0.500** | **0.000** | **12.6** | **80.2%** |
+| 95 × 77 | 0.687 | 0.687 | 0.000 | 17.4 | 73.3% |
+| 90 × 74 | 0.875 | 0.875 | 0.000 | 22.2 | 66.8% |
+| 85 × 71 | 1.063 | 1.063 | 0.000 | 26.9 | 60.5% |
+| 80 × 68 | 1.250 | 1.250 | 0.000 | 31.7 | 54.5% |
+| 75 × 65 | 1.437 | 1.437 | 0.000 | 36.5 | 48.9% |
+
+The default **100 × 80** (min = 12.6) is highlighted. Letter sweet spots
+are *perfectly* symmetric (H − V = 0.000 mm) because the Letter dimensions
+happen to align exactly with the 5-column / 3-row stepping pattern.
+
 **Non-sweet-spot values still work** — the grid will always be correctly
 snapped. The margins just won't be symmetric. For example, `\PageMarginMM{15}`
 gives 94 × 84 with MarginH = 15.465 mm vs MarginV = 15.150 mm (a 0.315 mm
 difference — imperceptible, but not mathematically elegant).
 
 **Why separate H/V margins aren't needed.** At a sweet spot the H/V difference
-is 0.002 mm (thinner than a human hair). Adding a second margin parameter would
-add complexity for no visible benefit.
+is ≤ 0.002 mm (thinner than a human hair). Adding a second margin parameter
+would add complexity for no visible benefit.
 
 ### Column Gap (X-Gap) Sweet Spots
 
@@ -384,7 +405,7 @@ remaining readable. Proportional text "floats" on its own baseline grid
 
 ## 9. Typeface File Inventory
 
-Files in `font/iosevka/typefaces/`:
+Files in `fonts/iosevka/`:
 
 ### Mono (grid-aligned, structural)
 | File | Used As | Role |

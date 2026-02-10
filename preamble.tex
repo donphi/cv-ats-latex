@@ -25,15 +25,13 @@
 % §1  DOCUMENT CLASS & PACKAGES
 % ============================================================================
 %
-% MASTER PARAMETERS (set before \documentclass — only \def allowed here):
+% MASTER PARAMETERS (loaded from generated/settings.tex — edit content/contact.yaml):
 %   \PageFormat .......... Paper size: "a4" (210×297mm) or "letter" (215.9×279.4mm)
-%   \PageMarginMM ........ Page margin on all four sides, in mm (numeric)
+%   \PageMarginMM ........ Page margin on all four sides, in mm (sweet spot value)
 % ============================================================================
 
-% --- Page format (master) ---------------------------------------------------
-%     Change to "letter" for US Letter, "a4" for ISO A4.
-\def\PageFormat{a4}
-\def\PageMarginMM{13.5}
+% --- Page format + margin (from content/contact.yaml via generated/settings.tex)
+\input{generated/settings.tex}
 
 % --- Page dimensions (derived — do not edit) --------------------------------
 \def\tmpPageFmt{a4}
@@ -175,7 +173,7 @@
 
 % --- Font loading -----------------------------------------------------------
 \setmonofont{Iosevka-Extended}[
-    Path=fonts/,
+    Path=fonts/iosevka/,
     Extension=.ttf,
     UprightFont=*,
     BoldFont=*Bold,
@@ -184,7 +182,7 @@
 ]
 
 \setmainfont{IosevkaAile}[
-    Path=fonts/,
+    Path=fonts/iosevka/,
     Extension=.ttf,
     UprightFont=*-Regular,
     BoldFont=*-Bold,
@@ -193,7 +191,7 @@
 ]
 
 \setsansfont{IosevkaEtoile}[
-    Path=fonts/,
+    Path=fonts/iosevka/,
     Extension=.ttf,
     UprightFont=*-Regular,
     BoldFont=*-Bold,
@@ -967,7 +965,7 @@
 }
 
 % ============================================================================
-% §9  CONTACT DATA — shared macros populated by components/contact.tex
+% §9  CONTACT DATA — shared macros populated by generated/contact.tex
 % ============================================================================
 % Each \Contact* command stores its argument into a macro.
 % canvas.tex inputs the contact file, then feeds the macros to \SetCVHeader.

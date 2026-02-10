@@ -16,30 +16,30 @@
 %   \GapBoxToBox ..... vertical gap between stacked boxes
 %
 % The ONLY things hardcoded here are:
-%   - \input paths to templates and components (these are file names, not params)
+%   - \input paths to engine and generated files (these are file names, not params)
 %   - Content text passed to \SetCVHeader (personal data)
 %   - The (0,0) origin for the header (it always starts at the top-left)
 %   - The 0 X-origin for the left column (it always starts at column 0)
 %
 % PAGE BREAKS: call \CVPageBreak between page sections.
-% SPLIT CONTENT: break long components into -1.tex / -2.tex and use
+% SPLIT CONTENT: break long generated files into -1.tex / -2.tex and use
 %                separate \LeftBox calls on different pages.
 %
 % ============================================================================
 
 % ----------------------------------------------------------------------------
-% LOAD TEMPLATES + PAGEFLOW
+% LOAD ENGINE + PAGEFLOW
 % ----------------------------------------------------------------------------
-\input{templates/header.tex}
-\input{templates/leftbox.tex}
-\input{templates/rightbox.tex}
-\input{templates/fullbox.tex}
-\input{templates/pageflow.tex}
+\input{engine/header.tex}
+\input{engine/leftbox.tex}
+\input{engine/rightbox.tex}
+\input{engine/fullbox.tex}
+\input{engine/pageflow.tex}
 
 % ----------------------------------------------------------------------------
-% LOAD CONTACT DATA (shared with ATS pipeline via components/contact.tex)
+% LOAD CONTACT DATA (shared with ATS pipeline via generated/contact.tex)
 % ----------------------------------------------------------------------------
-\input{components/contact.tex}
+\input{generated/contact.tex}
 
 % ----------------------------------------------------------------------------
 % STORE HEADER (repeated on every page via \CVPageBreak)
@@ -64,17 +64,17 @@
 
 % --- Left column (starts at col 0, below header) ---
 \LeftBoxInit{0}{\ContentStartY}
-\LeftBox{SUMMARY}{components/summary.tex}
+\LeftBox{SUMMARY}{generated/summary.tex}
 \LeftBoxGap{\GapBoxToBox}
-\LeftBox{AI \& ML EXPERIENCE}{components/research_experience.tex}
+\LeftBox{RESEARCH EXPERIENCE}{generated/research_experience.tex}
 \LeftBoxGap{\GapBoxToBox}
-\LeftBox{PREVIOUS WORK}{components/work_experience.tex}
+\LeftBox{WORK EXPERIENCE}{generated/work_experience.tex}
 
 % --- Right column (starts at \RightColX, below header) ---
 \RightBoxInit{\RightColX}{\ContentStartY}
-\RightBox{TECHNICAL SKILLS}{components/skills.tex}
+\RightBox{TECHNICAL SKILLS}{generated/skills.tex}
 \RightBoxGap{\GapBoxToBox}
-\RightBox{EDUCATION}{components/education.tex}
+\RightBox{EDUCATION}{generated/education.tex}
 
 % ============================================================================
 % PAGE 2
@@ -83,7 +83,7 @@
 
 % --- Left column (continued) ---
 \LeftBoxInit{0}{\ContentStartY}
-\LeftBox{PREVIOUS WORK}{components/work_experience.tex}
+\LeftBox{WORK EXPERIENCE}{generated/work_experience.tex}
 
 % --- Right column ---
 \RightBoxInit{\RightColX}{\ContentStartY}
