@@ -1,11 +1,23 @@
 # LaTeX CV / Resume Builder — Designed + ATS-Optimised (A4 & US Letter)
 
-A single set of YAML files generates two PDFs: a **designed CV** with monospaced box-drawing typography and an **ATS-friendly resume** optimised for applicant tracking systems. Supports A4 (UK/EU curriculum vitae) and US Letter (American resume). Edit your content once, run one Docker command, get both versions.
+One set of YAML files. Two PDFs. Zero LaTeX knowledge required.
 
-- **A4** builds produce files named `yourname-cv.pdf` and `yourname-cv-ats.pdf`
-- **US Letter** builds produce `yourname-resume.pdf` and `yourname-resume-ats.pdf`
+A **designed CV** with monospaced box-drawing typography and an **ATS-friendly resume** built for applicant tracking systems — both generated from the same content, both compiled inside Docker. Supports A4 (UK/EU curriculum vitae) and US Letter (American resume).
 
-**Only requirement: Docker and Docker Compose.**
+**Only requirement: [Docker](https://www.docker.com/) and Docker Compose.**
+
+---
+
+## What You Get
+
+<!-- SCREENSHOT: Full-page side-by-side of both PDFs.
+     Capture: Open fred-durst-cv.pdf and fred-durst-cv-ats.pdf side by side.
+     Zoom to fit both full pages in one screenshot.
+     Save as: doc/images/both-cvs-side-by-side.png
+     Dimensions: ~1400px wide recommended. -->
+![Designed CV and ATS Resume side by side](doc/images/both-cvs-side-by-side.png)
+
+*Left: the designed CV with box-drawing grid layout. Right: the ATS-optimised version — clean, parseable, no formatting tricks.*
 
 ---
 
@@ -17,26 +29,93 @@ git clone https://github.com/donphi/cv.git && cd cv
 
 # 2. Edit your content (the only files you touch)
 cp content/contact.yaml.example content/contact.yaml
-#    Then open content/contact.yaml and fill in your details.
-#    Edit the other content/*.yaml files with your experience, education, etc.
+#    Then fill in content/contact.yaml and the other content/*.yaml files.
 
 # 3. Build both PDFs
 ./build.sh
 
-# 4. Open your PDFs
-#    Output filenames are based on your name and paper size:
-#    e.g. donald-philp-cv.pdf and donald-philp-cv-ats.pdf
+# That's it. Your PDFs appear in the project root:
+#   fred-durst-cv.pdf        (designed)
+#   fred-durst-cv-ats.pdf    (ATS-optimised)
 ```
 
-Build flags:
-
-| Flag | Effect |
-|------|--------|
+| Flag | What it does |
+|------|-------------|
 | `./build.sh` | Build both designed + ATS PDFs |
 | `./build.sh -d` | Designed CV only |
 | `./build.sh -a` | ATS CV only |
 | `./build.sh -b` | Force-rebuild Docker images first |
 | `./build.sh -c` | Remove all build artifacts |
+
+- **A4** builds produce `yourname-cv.pdf` and `yourname-cv-ats.pdf`
+- **US Letter** builds produce `yourname-resume.pdf` and `yourname-resume-ats.pdf`
+
+Fonts are downloaded automatically on first build (~15 seconds). Subsequent builds skip the download.
+
+---
+
+## The Example: Fred Durst's CV
+
+The repo ships with a complete example CV for **Fred Durst** — Senior Nookie Engineer, frontman of Limp Bizkit, film director, and certified backwards-red-cap operator. Every YAML file is filled in so you can build immediately and see exactly what the output looks like before editing your own content.
+
+### The Designed CV
+
+<!-- SCREENSHOT: Full page 1 of the designed CV.
+     Capture: Open fred-durst-cv.pdf, page 1, zoom to fit width.
+     Save as: doc/images/designed-page1.png -->
+![Designed CV — Page 1](doc/images/designed-page1.png)
+
+The designed version uses a **character-cell grid** — every element is placed on an exact monospaced grid, giving the layout a technical, engineered feel. The left column holds work experience and research; the right column holds education, skills, and contact details.
+
+### Header Detail
+
+<!-- SCREENSHOT: Zoomed crop of the header area (name, title, contact bar).
+     Capture: Zoom to ~200% on the top of page 1, crop just the header
+     section showing the name "Fred Durst", title, and contact line.
+     Save as: doc/images/detail-header.png -->
+![Header detail](doc/images/detail-header.png)
+
+*The header is built from `content/contact.yaml`. Name, title, email, phone, LinkedIn, GitHub, and location — all pulled from one file.*
+
+### Work Experience Detail
+
+<!-- SCREENSHOT: Zoomed crop of one work experience entry.
+     Capture: Zoom to ~200% on the "Lead Vocalist & Chief Nookie Officer"
+     entry showing the role, company, dates, and bullet points.
+     Save as: doc/images/detail-work-experience.png -->
+![Work experience detail](doc/images/detail-work-experience.png)
+
+*Each role shows the title, company, date range, and bullet points. The box-drawing borders and section headers are all generated — you just write plain text in `content/work_experience.yaml`.*
+
+### Skills & Education Detail
+
+<!-- SCREENSHOT: Zoomed crop of the right column showing skills and education.
+     Capture: Zoom to ~200% on the right column, crop to show the skills
+     grid and at least one education entry with a progress bar.
+     Save as: doc/images/detail-skills-education.png -->
+![Skills and education detail](doc/images/detail-skills-education.png)
+
+*Skills are grouped by category. Education entries can include an optional progress bar (the "Certified Red Cap Specialist" at 100% is a personal favourite).*
+
+### The ATS Version
+
+<!-- SCREENSHOT: Full page 1 of the ATS CV.
+     Capture: Open fred-durst-cv-ats.pdf, page 1, zoom to fit width.
+     Save as: doc/images/ats-page1.png -->
+![ATS CV — Page 1](doc/images/ats-page1.png)
+
+*The ATS version strips all visual formatting. Plain sections, plain bullets, standard fonts. Acronyms are expanded on first use (e.g. "Artists and Repertoire (A&R)"). This is what the robot reads.*
+
+### Certifications & Publications
+
+<!-- SCREENSHOT: Zoomed crop of the certifications and publications sections
+     from either the designed or ATS version (whichever looks better).
+     Capture: Zoom to ~200%, crop to show the certifications list
+     (RIAA Diamond, MTV VMA, etc.) and publications list.
+     Save as: doc/images/detail-certs-pubs.png -->
+![Certifications and publications](doc/images/detail-certs-pubs.png)
+
+*Both sections are optional — leave `entries: []` in the YAML to omit them entirely. Fred's RIAA Diamond certification and backwards-cap aerodynamics patent are included for demonstration purposes.*
 
 ---
 
@@ -47,166 +126,163 @@ content/          <-- YOUR DATA. The only place you edit.
 generated/        <-- Auto-built LaTeX files. Do not hand-edit.
 engine/           <-- Layout templates (header, boxes, pageflow). Advanced only.
 fonts/            <-- Iosevka typefaces (auto-downloaded on first build) + build parameters.
-scripts/          <-- Python generator. Reads content/, writes generated/ + ats_main.tex.
-doc/              <-- Deep-dive documentation (grid sizing, ATS requirements).
+scripts/          <-- Python generator + font downloader.
+doc/              <-- Deep-dive docs (grid sizing, ATS requirements, images).
 preamble.tex      <-- Styling hyperparameters (fonts, colours, spacing, grid). Advanced only.
 canvas.tex        <-- Page assembly (which boxes go where). Advanced only.
-main.tex            <-- Entry point for LuaLaTeX. Do not edit.
+cv.tex            <-- Entry point for LuaLaTeX. Do not edit.
 ```
 
 ---
 
 ## Editing Your Content (Basic)
 
-All content lives in `content/*.yaml`. Each file has comments explaining the format. Special characters (`&`, `$`, `%`, `#`, `_`, `~`) are auto-escaped for LaTeX -- just type plain text.
+All content lives in `content/*.yaml`. Each file has inline comments explaining the format. Special characters (`&`, `$`, `%`, `#`, `_`, `~`) are auto-escaped — just type plain text.
 
-### contact.yaml -- your details, paper size, and margin
+### contact.yaml — your details, paper size, and margin
 
 ```yaml
-paper_size: "a4"          # "a4" (UK/EU, produces a CV) or "letter" (US, produces a Resume)
-margin: 13.5              # page margin in mm — MUST be a sweet spot (see below)
-name: "Your Name"
-title: "Your Target Job Title"
-email: "you@example.com"
-phone: "+44 123 456 7890"
-linkedin: "linkedin.com/in/you"    # no https:// prefix
-github: "github.com/you"           # no https:// prefix
-location: "London, UK"
-full_cv_url: "https://you.com/cv.pdf"  # shown on ATS version
+paper_size: "a4"          # "a4" (UK/EU → CV) or "letter" (US → Resume)
+margin: 13.5              # page margin in mm — pick a sweet spot (see below)
+name: "Fred Durst"
+title: "Senior Nookie Engineer"
+email: "fred.durst@limpbizkit.com"
+phone: "+1 904 555 1998"
+linkedin: "linkedin.com/in/freddurst"
+github: "github.com/freddurst"
+location: "Jacksonville, FL"
+full_cv_url: "https://freddurst.com/cv.pdf"
 ```
 
-**Margin sweet spots** — the designed CV uses a character grid. The margin must be a "sweet spot" so all four sides are equal. Pick from your paper size's row:
+**Margin sweet spots** — the designed CV uses a character grid. The margin must be a "sweet spot" so all four sides are equal:
 
 | Paper size | Sweet spot margins (mm) | Default |
 |------------|------------------------|---------|
 | **A4** (default) | 4.0 · 8.7 · **13.5** · 18.3 · 23.0 · 27.8 | **13.5** |
 | Letter | 3.1 · 7.9 · **12.6** · 17.4 · 22.2 · 26.9 | **12.6** |
 
-See `content/contact.yaml` comments or `doc/iosevka_sizing.md` for the full explanation and ASCII diagram.
+See `content/contact.yaml` for the full ASCII diagram explaining how the grid works, or `doc/iosevka_sizing.md` for the deep derivation.
 
-### summary.yaml -- professional summary
-
-A single paragraph. Use `---` for em-dash, `--` for en-dash.
+### summary.yaml — professional summary
 
 ```yaml
 text: >-
-  Your professional summary goes here. Plain text, no bullet points.
-  The >- syntax folds multiple lines into one paragraph.
+  Visionary frontman, director, and audio systems architect with 10+ years
+  leading high-throughput live performance pipelines processing 20,000+
+  concurrent audience nodes per venue. I keep rollin', rollin', rollin'.
 ```
 
-### work_experience.yaml -- jobs
+### work_experience.yaml — jobs
 
 ```yaml
 entries:
-  - role: "Job Title"
-    company: "Company Name"
-    dates: "Mar 2023 -- Feb 2024"     # Mon YYYY -- Mon YYYY
-    location: "London, UK"
+  - role: "Lead Vocalist & Chief Nookie Officer"
+    company: "Limp Bizkit"
+    dates: "Aug 1994 -- Present"
+    location: "Jacksonville, FL"
     bullets:
-      - "First achievement or responsibility"
-      - "Second achievement"
+      - "Scaled live performance infrastructure to 400,000-node distributed audiences"
+      - "Negotiated and closed a $30M record deal with Interscope/Flip Records"
 ```
 
-### education.yaml -- degrees and courses
+### education.yaml — degrees and courses
 
 ```yaml
 entries:
-  - degree: "MSc Computer Science"
-    institution: "University Name"
-    dates: "2024 -- 2026"
-    location: "London, UK"
-    details: "First-class ~78% avg"    # shown as italic text (ATS) or progress bar (designed)
-    progress: 78                       # 0-100, optional, designed CV only
+  - degree: "Certified Red Cap Specialist"
+    institution: "New Era Institute of Headwear Sciences"
+    dates: "1997"
+    location: "Buffalo, NY"
+    details: "Backwards orientation, 100% consistency"
+    progress: 100    # optional progress bar (0-100), designed CV only
 ```
 
-### skills.yaml -- skill groups
+### skills.yaml — skill groups
 
 ```yaml
 groups:
-  - category: "Languages"
+  - category: "Headwear"
     items:
-      - "Python, Go, Rust"            # each item = one line in designed CV
-      - "TypeScript, SQL"
+      - "Red cap (backwards, 100% uptime)"
+      - "Fitted, snapback, trucker variants"
+      - "All-weather deployment certified"
 ```
 
-### research_experience.yaml -- research roles (optional)
+### research_experience.yaml — research roles (optional)
 
 Like work experience but with subsections for project groupings. Omit or leave `entries: []` to skip.
 
-### certifications.yaml -- certifications (optional)
+### certifications.yaml — certifications (optional)
 
-Leave `entries: []` to omit this section entirely. To add certifications:
+Leave `entries: []` to omit. To add:
 
 ```yaml
 entries:
-  - name: "AWS Solutions Architect – Associate"
-    issuer: "Amazon Web Services"
-    year: "2024"
+  - name: "RIAA Diamond Certification — Significant Other"
+    issuer: "Recording Industry Association of America"
+    year: "2001"
 
-  - name: "Certified Kubernetes Administrator"
-    issuer: "Cloud Native Computing Foundation"
-    year: "2023"
-
-  - name: "Google Professional Data Engineer"
-    issuer: "Google Cloud"
-    year: "2023"
+  - name: "Backwards Red Cap Operator Licence (Level 5)"
+    issuer: "New Era Cap Company"
+    year: "1997"
 ```
 
-### publications.yaml -- papers, patents, articles (optional)
+### publications.yaml — albums, papers, patents (optional)
 
-Leave `entries: []` to omit this section entirely. To add publications:
+Leave `entries: []` to omit. To add:
 
 ```yaml
 entries:
-  - authors: "Back, S., Smith, J., & Lee, K."
-    title: "Scalable Transformer Architectures for Document Understanding"
-    venue: "NeurIPS 2025"
-    year: "2025"
+  - authors: "Durst, F., Borland, W., Rivers, W., Otto, J., & Lethal, DJ"
+    title: "Significant Other"
+    venue: "Flip/Interscope Records (7x Platinum)"
+    year: "1999"
 
-  - authors: "Scott, D."
-    title: "Patent: Method for Adaptive Layout Generation (US 11,234,567)"
+  - authors: "Durst, F."
+    title: "Patent: Method for Backwards Cap Aerodynamic Optimisation (US 6,969,420)"
     venue: "United States Patent and Trademark Office"
-    year: "2023"
+    year: "2002"
 ```
 
-### acronyms.yaml -- ATS acronym expansion
+### acronyms.yaml — ATS acronym expansion
 
 First occurrence of each acronym in the ATS PDF is expanded. The designed CV is unaffected.
 
 ```yaml
 acronyms:
-  AI: "Artificial Intelligence"
-  ML: "Machine Learning"
+  A&R: "Artists and Repertoire"
+  RIAA: "Recording Industry Association of America"
+  MTV: "Music Television"
+  DJ: "Disc Jockey"
+  BPM: "Beats Per Minute"
 ```
 
 ---
 
 ## Customising the Design (Advanced)
 
-The files below control how the CV looks. You should not need to touch them for basic use, but they are fully documented for customisation.
+You should not need to touch these for basic use, but they are fully documented.
 
 ### Paper Size and Margins
 
-Both `paper_size` and `margin` are set in `content/contact.yaml`. The generator writes them into `generated/settings.tex`, which is loaded by `preamble.tex` before `\documentclass`. There is nothing to edit in `preamble.tex` for paper size or margins.
+Both are set in `content/contact.yaml`. The generator writes them into `generated/settings.tex`, which `preamble.tex` loads before `\documentclass`. Nothing to edit in `preamble.tex`.
 
-See `doc/iosevka_sizing.md` for the full table of symmetric margin sweet spots and the math behind them.
-
-### Colour Themes -- preamble.tex section 4
+### Colour Themes — preamble.tex section 4
 
 Four built-in themes. Uncomment one block, comment the others, rebuild:
 
-- **Cool Blue** (active by default)
+- **Cool Blue** (default)
 - **Warm Orange**
 - **Monochrome**
 - **Forest Green**
 
 The colour system has 3 tiers:
 
-1. **Palette** (8 hex values) -- the only place hex codes exist. Swap one block to re-theme everything.
-2. **Roles** -- maps palette to functional categories (box lines, accents, text). Normally untouched.
-3. **Elements** -- every visual element has its own colour name. Override any single one to break it out of its group.
+1. **Palette** (8 hex values) — the only place hex codes exist. Swap one block to re-theme everything.
+2. **Roles** — maps palette to functional categories (box lines, accents, text). Normally untouched.
+3. **Elements** — every visual element has its own colour name. Override any single one to break it out of its group.
 
-### Column Layout -- preamble.tex section 6
+### Column Layout — preamble.tex section 6
 
 ```latex
 \newcommand{\LeftBoxWidth}{60}    % left column width in grid columns
@@ -214,38 +290,38 @@ The colour system has 3 tiers:
 % RightBoxWidth is auto-derived: GridCols - LeftBoxWidth - ColumnGap
 ```
 
-### Box Types -- canvas.tex
+### Box Types — canvas.tex
 
 Three box types for placing content on the page:
 
-- `\LeftBox{TITLE}{generated/file.tex}` -- left column box
-- `\RightBox{TITLE}{generated/file.tex}` -- right column box
-- `\FullBox{TITLE}{generated/file.tex}` -- full-width box
+- `\LeftBox{TITLE}{generated/file.tex}` — left column box
+- `\RightBox{TITLE}{generated/file.tex}` — right column box
+- `\FullBox{TITLE}{generated/file.tex}` — full-width box
 
 All boxes auto-measure their content height. Stack them with `\LeftBoxGap{\GapBoxToBox}` between.
 
-### Page Breaks and Multi-Page -- canvas.tex
+### Page Breaks — canvas.tex
 
 ```latex
 \CVPageBreak          % start a new page (header repeats automatically)
-\LeftBoxInit{0}{\ContentStartY}   % reset left column cursor
-\RightBoxInit{\RightColX}{\ContentStartY}  % reset right column cursor
+\LeftBoxInit{0}{\ContentStartY}
+\RightBoxInit{\RightColX}{\ContentStartY}
 ```
 
-### Font Sizing -- preamble.tex section 2
+### Font Sizing — preamble.tex section 2
 
 ```latex
 \newcommand{\GridFontSize}{9}        % base mono font size in pt
 \newcommand{\MonoWidthRatio}{0.6}    % character width:height ratio
 ```
 
-Changing `\GridFontSize` rescales the entire grid. See `doc/iosevka_sizing.md` for the full derivation and grid-density table.
+Changing `\GridFontSize` rescales the entire grid. See `doc/iosevka_sizing.md` for the derivation.
 
 ---
 
 ## Fonts
 
-Three Iosevka families are used (15 TTF files total, ~150 MB):
+Three [Iosevka](https://github.com/be5invis/Iosevka) families are used (15 TTF files, ~150 MB):
 
 | Family | Role | Style |
 |--------|------|-------|
@@ -257,9 +333,7 @@ Three Iosevka families are used (15 TTF files total, ~150 MB):
 
 The font version is pinned in `scripts/fetch-fonts.sh` (currently v34.1.0). To update, change `IOSEVKA_VERSION`, delete the cached TTFs, and rebuild.
 
-Source: [github.com/be5invis/Iosevka](https://github.com/be5invis/Iosevka) (SIL Open Font License).
-
-Custom build parameters are stored in `fonts/iosevka/parameters/` for reference. These are Iosevka's upstream config files and are not used during LaTeX compilation.
+Custom build parameters are stored in `fonts/iosevka/parameters/` for reference (Iosevka's upstream config files, not used during LaTeX compilation).
 
 ---
 
@@ -267,26 +341,26 @@ Custom build parameters are stored in `fonts/iosevka/parameters/` for reference.
 
 ```
 content/*.yaml                    You edit these
-       |
-       v
+       │
+       ▼
 scripts/generate.py               Runs inside Docker
-       |
-       +---> generated/*.tex       Designed CV components (LaTeX)
-       +---> generated/settings.tex   Paper size config
-       +---> generated/.build-meta    Dynamic output filenames
-       +---> ats_main.tex          ATS CV (self-contained LaTeX)
-       |
-       v
+       │
+       ├──▶ generated/*.tex       Designed CV components
+       ├──▶ generated/settings.tex   Paper size + margin
+       ├──▶ generated/.build-meta    Dynamic output filenames
+       └──▶ ats_main.tex          ATS CV (self-contained)
+       │
+       ▼
 canvas.tex + preamble.tex         Layout engine
 + engine/*.tex
-       |
-       v
+       │
+       ▼
 LuaLaTeX (designed)               Docker container
 pdfLaTeX (ATS)                    Docker container
-       |
-       v
-yourname-cv.pdf                   Designed CV
-yourname-cv-ats.pdf               ATS-optimised CV
+       │
+       ▼
+fred-durst-cv.pdf                 Designed CV
+fred-durst-cv-ats.pdf             ATS-optimised CV
 ```
 
 The generator reads plain YAML, escapes special characters for LaTeX, and writes two outputs:
@@ -313,3 +387,9 @@ Both outputs are compiled inside Docker containers. No local dependencies beyond
 | `doc/iosevka_sizing.md` | Grid derivation, margin sweet spots, font metrics, column layout math |
 | `doc/ats_requirements.md` | ATS formatting rules and constraints |
 | `doc/ats_check.md` | ATS compliance checklist |
+
+---
+
+## License
+
+Iosevka fonts: [SIL Open Font License](https://github.com/be5invis/Iosevka/blob/main/LICENSE.md). Everything else: do whatever you want with it. Keep rollin'.
