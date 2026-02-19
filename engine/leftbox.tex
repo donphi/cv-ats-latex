@@ -117,7 +117,7 @@
     \pgfmathtruncatemacro{\bgW}{\innerW - 2}%
     \pgfmathtruncatemacro{\bgH}{\bodyRows - 2}%
     \begin{textblock}{\bgW}(\bgX,\bgY)%
-        {\fboxsep=0pt\relax\colorbox{content-bg}{\makebox[\bgW\TPHorizModule][l]{\rule{0pt}{\bgH\TPVertModule}}}}%
+        \noindent{\color{content-bg}\rule{\bgW\TPHorizModule}{\bgH\TPVertModule}}%
     \end{textblock}%
     %
     % Layer 2: Content text, positioned with padding offsets on top of the bg.
