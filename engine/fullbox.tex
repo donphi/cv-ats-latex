@@ -120,10 +120,10 @@
     %          inset by 1 grid cell on each side so 1 dot column/row stays visible.
     \pgfmathsetmacro{\bgX}{\FullPosX + 2}%
     \pgfmathsetmacro{\bgY}{\FullPosY + 2}%
-    \pgfmathtruncatemacro{\bgW}{\innerW - 3}%
-    \pgfmathtruncatemacro{\bgH}{\bodyRows - 3}%
+    \pgfmathtruncatemacro{\bgW}{\innerW - 2}%
+    \pgfmathtruncatemacro{\bgH}{\bodyRows - 2}%
     \begin{textblock}{\bgW}(\bgX,\bgY)%
-        \colorbox{content-bg}{\makebox[\bgW\TPHorizModule][l]{\rule{0pt}{\bgH\TPVertModule}}}%
+        {\fboxsep=0pt\relax\colorbox{content-bg}{\makebox[\bgW\TPHorizModule][l]{\rule{0pt}{\bgH\TPVertModule}}}}%
     \end{textblock}%
     %
     % Layer 2: Content text, positioned with padding offsets on top of the bg.
