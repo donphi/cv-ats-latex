@@ -319,24 +319,17 @@ def gen_designed_research(data: dict) -> str:
     lines = [GENERATED_HEADER.format(source="research_experience")]
 
     for i, entry in enumerate(entries):
-        # Project title for designed CV (falls back to role)
-        project_title = escape_latex(
-            entry.get("project_title", entry.get("role", ""))
-        )
+        role = escape_latex(entry.get("role", ""))
+        company = escape_latex(entry.get("company", ""))
+        dates = entry.get("dates", "")
+        location = entry.get("location", "")
 
-        # Subtitle: explicit override or auto-built
-        subtitle = entry.get("designed_subtitle", "")
-        if not subtitle:
-            company = entry.get("company", "")
-            role = entry.get("role", "")
-            dates = entry.get("dates", "")
-            subtitle = f"{company}, {role} | {dates}"
-        subtitle = escape_latex(subtitle)
+        dates_designed = _dates_to_designed(dates)
 
-        # First entry uses \SubHeadFirst (no top gap)
-        head_cmd = "\\SubHeadFirst" if i == 0 else "\\SubHeadFirst"
-        lines.append(f"{head_cmd}{{{project_title}}}")
-        lines.append(f"{{{subtitle}}}")
+        lines.append(f"\\JobHead{{{role}}}")
+        lines.append(f"    {{{company}}}")
+        lines.append(f"    {{{dates_designed}}}")
+        lines.append(f"    {{{location}}}")
 
         # Optional description
         desc = entry.get("description", "")
@@ -356,6 +349,11 @@ def gen_designed_research(data: dict) -> str:
                 cmd = "\\TreeLast" if j == len(bullets) - 1 else "\\TreeItem"
                 lines.append(f"    {cmd}{{{escape_latex(bullet)}}}")
             lines.append("\\end{treelist}")
+
+        if i < len(entries) - 1:
+            lines.append("")
+            lines.append("\\JobSep")
+            lines.append("")
 
     return "\n".join(lines) + "\n"
 
