@@ -110,7 +110,7 @@
     % =========================================================================
     %
     % Layer 1: Background rectangle covering dots inside the border,
-    %          inset by 1 grid cell on each side so 1 dot column/row stays visible.
+    %          Uses integer grid units and a bare \rule for exact dimensions.
     \pgfmathsetmacro{\bgX}{\RightPosX + 2}%
     \pgfmathsetmacro{\bgY}{\RightPosY + 2}%
     \pgfmathtruncatemacro{\bgW}{\innerW - 2}%

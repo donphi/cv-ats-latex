@@ -110,8 +110,8 @@
     % STEP 3: PLACE CONTENT (two layers: background overlay + text)
     % =========================================================================
     %
-    % Layer 1: Background rectangle covering dots inside the border,
-    %          inset by 1 grid cell on each side so 1 dot column/row stays visible.
+    % Layer 1: Background rectangle with 1 dot visible on each side.
+    %          Uses integer grid units and a bare \rule for exact dimensions.
     \pgfmathsetmacro{\bgX}{\LeftPosX + 2}%
     \pgfmathsetmacro{\bgY}{\LeftPosY + 2}%
     \pgfmathtruncatemacro{\bgW}{\innerW - 2}%
