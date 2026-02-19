@@ -1,19 +1,28 @@
 # ──────────────────────────────────────────────────────────────────
-# LAYOUT — section order and column assignments for the designed CV
+# LAYOUT — section order and placement for the designed CV
 # ──────────────────────────────────────────────────────────────────
 #
-# This file declares which sections appear in which column and in
-# what order. The layout engine (scripts/layout.py) reads this to
-# generate canvas.tex with automatic page breaks.
+# The layout engine (scripts/layout.py) reads this file to generate
+# canvas.tex with automatic page breaks.
+#
+# ORDERING:
+#   Sections are placed on the page TOP-TO-BOTTOM in the order
+#   listed here. To move a section higher or lower on the page,
+#   move its entry up or down in this list.
+#
+# COLUMNS:
+#   column: "left"   — placed in the left column
+#   column: "right"  — placed in the right column
+#   column: "full"   — spans the entire page width
+#
+#   Consecutive left/right sections appear SIDE-BY-SIDE.
+#   A "full" section spans the full width and appears BELOW
+#   whatever came before it (and ABOVE whatever comes after).
 #
 # Fields:
 #   title   : Box title (appears in the top border, e.g. "SUMMARY")
 #   content : Generated .tex filename (relative to generated/)
 #   column  : "left", "right", or "full"
-#
-# Sections within the same column are placed top-to-bottom in the
-# order listed here. A gap of \GapBoxToBox rows is inserted between
-# consecutive boxes in the same column.
 #
 # ──────────────────────────────────────────────────────────────────
 

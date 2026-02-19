@@ -182,6 +182,37 @@ def split_content_file(
 
 
 # ---------------------------------------------------------------------------
+# Band grouping — consecutive left/right sections form one band;
+# each full-width section forms its own band.
+# ---------------------------------------------------------------------------
+
+def _group_into_bands(sections: list[dict]) -> list[dict]:
+    """Group a flat section list into bands based on YAML order.
+
+    Returns a list of band dicts.  Each band has either:
+      {"left": [...], "right": [...]}   — column band
+    or:
+      {"full": [...]}                   — full-width band
+    """
+    bands: list[dict] = []
+    current: dict[str, list[dict]] = {"left": [], "right": []}
+
+    for sec in sections:
+        if sec["column"] == "full":
+            if current["left"] or current["right"]:
+                bands.append(current)
+                current = {"left": [], "right": []}
+            bands.append({"full": [sec]})
+        else:
+            current[sec["column"]].append(sec)
+
+    if current["left"] or current["right"]:
+        bands.append(current)
+
+    return bands
+
+
+# ---------------------------------------------------------------------------
 # Canvas generation helpers
 # ---------------------------------------------------------------------------
 
@@ -245,49 +276,48 @@ def generate_measure_canvas(sections: list[dict], header_theme: str) -> None:
 
     This is used for pass 1 so the box templates can measure content heights
     and write them to boxheights.dat via \\LogBoxHeight.
+    Boxes may overflow off the page — that's fine for measurement.
     """
-    left_secs = [s for s in sections if s["column"] == "left"]
-    right_secs = [s for s in sections if s["column"] == "right"]
-    full_secs = [s for s in sections if s["column"] == "full"]
+    bands = _group_into_bands(sections)
 
     out: list[str] = [_canvas_header(header_theme)]
-
     _emit_page_header(out, 1)
 
-    # Place all boxes on page 1, matching the original canvas structure.
-    # The box templates measure content in a \savebox before placement,
-    # and \LogBoxHeight writes the measured height to boxheights.dat.
-    # Boxes may overflow off the page — that's fine for measurement.
-
-    # Left column
-    if left_secs:
-        out.append("% --- Left column ---")
-        out.append(r"\LeftBoxInit{0}{\ContentStartY}")
-        for i, sec in enumerate(left_secs):
-            if i > 0:
-                out.append(r"\LeftBoxGap{\GapBoxToBox}")
-            out.append(f"\\LeftBox{{{sec['title']}}}{{generated/{sec['content']}}}")
-        out.append("")
-
-    # Right column
-    if right_secs:
-        out.append("% --- Right column ---")
-        out.append(r"\RightBoxInit{\RightColX}{\ContentStartY}")
-        for i, sec in enumerate(right_secs):
-            if i > 0:
-                out.append(r"\RightBoxGap{\GapBoxToBox}")
-            out.append(f"\\RightBox{{{sec['title']}}}{{generated/{sec['content']}}}")
-        out.append("")
-
-    # Full-width
-    if full_secs:
-        out.append("% --- Full-width ---")
-        out.append(r"\FullBoxInit{0}{\ContentStartY}")
-        for i, sec in enumerate(full_secs):
-            if i > 0:
-                out.append(r"\FullBoxGap{\GapBoxToBox}")
-            out.append(f"\\FullBox{{{sec['title']}}}{{generated/{sec['content']}}}")
-        out.append("")
+    for band_idx, band in enumerate(bands):
+        if "full" in band:
+            secs = band["full"]
+            out.append(f"% --- Band {band_idx + 1}: Full-width ---")
+            out.append(r"\FullBoxInit{0}{\ContentStartY}")
+            for i, sec in enumerate(secs):
+                if i > 0:
+                    out.append(r"\FullBoxGap{\GapBoxToBox}")
+                out.append(
+                    f"\\FullBox{{{sec['title']}}}{{generated/{sec['content']}}}"
+                )
+            out.append("")
+        else:
+            left_secs = band.get("left", [])
+            right_secs = band.get("right", [])
+            if left_secs:
+                out.append(f"% --- Band {band_idx + 1}: Left column ---")
+                out.append(r"\LeftBoxInit{0}{\ContentStartY}")
+                for i, sec in enumerate(left_secs):
+                    if i > 0:
+                        out.append(r"\LeftBoxGap{\GapBoxToBox}")
+                    out.append(
+                        f"\\LeftBox{{{sec['title']}}}{{generated/{sec['content']}}}"
+                    )
+                out.append("")
+            if right_secs:
+                out.append(f"% --- Band {band_idx + 1}: Right column ---")
+                out.append(r"\RightBoxInit{\RightColX}{\ContentStartY}")
+                for i, sec in enumerate(right_secs):
+                    if i > 0:
+                        out.append(r"\RightBoxGap{\GapBoxToBox}")
+                    out.append(
+                        f"\\RightBox{{{sec['title']}}}{{generated/{sec['content']}}}"
+                    )
+                out.append("")
 
     out.append(r"\endinput")
 
@@ -317,21 +347,27 @@ def generate_layout_canvas(
                 "Re-run the measurement pass."
             )
 
-    left_secs = [s for s in sections if s["column"] == "left"]
-    right_secs = [s for s in sections if s["column"] == "right"]
-    full_secs = [s for s in sections if s["column"] == "full"]
+    bands = _group_into_bands(sections)
 
     gap_box = grid["gap_box"]
     max_y = grid["max_page_y"]
-    start_y = grid["content_start_y"]
+    content_start_y = grid["content_start_y"]
     min_split = grid["min_split_rows"]
 
     class BoxPlacement:
-        def __init__(self, title: str, content_path: str, column: str, page: int):
+        __slots__ = ("title", "content_path", "column", "page", "init_y",
+                      "band_idx")
+
+        def __init__(
+            self, title: str, content_path: str, column: str,
+            page: int, init_y: float, band_idx: int,
+        ):
             self.title = title
             self.content_path = content_path
             self.column = column
             self.page = page
+            self.init_y = init_y
+            self.band_idx = band_idx
 
     def pad_top(col: str) -> float:
         return grid[f"{col}_pad_top"]
@@ -340,11 +376,20 @@ def generate_layout_canvas(
         return grid[f"{col}_pad_bot"]
 
     def layout_column(
-        col_sections: list[dict], column: str
-    ) -> tuple[list[BoxPlacement], int]:
+        col_sections: list[dict],
+        column: str,
+        col_start_y: float,
+        col_start_page: int,
+        band_idx: int,
+    ) -> tuple[list[BoxPlacement], int, float]:
+        """Lay out sections in a single column.
+
+        Returns (placements, max_page, end_y) where end_y is the Y cursor
+        position after the last box on max_page.
+        """
         placements: list[BoxPlacement] = []
-        current_y = start_y
-        current_page = 1
+        current_y = col_start_y
+        current_page = col_start_page
 
         for i, sec in enumerate(col_sections):
             content_key = f"generated/{sec['content']}"
@@ -352,21 +397,19 @@ def generate_layout_canvas(
             c_rows = heights[content_key]
             b_rows = box_rows(c_rows, pad_top(column), pad_bot(column))
 
-            # Gap before this box (except first on this page-column)
             gap_needed = gap_box if (
                 i > 0 and placements and placements[-1].page == current_page
             ) else 0
             test_y = current_y + gap_needed
 
             if test_y + b_rows <= max_y:
-                # Fits on current page
                 current_y = test_y
                 placements.append(BoxPlacement(
-                    title, f"generated/{sec['content']}", column, current_page
+                    title, f"generated/{sec['content']}", column,
+                    current_page, col_start_y, band_idx,
                 ))
                 current_y += b_rows
             else:
-                # Overflow — try to split
                 available_content = int(
                     max_y - test_y - 1 - pad_top(column) - pad_bot(column) - 1
                 )
@@ -383,7 +426,9 @@ def generate_layout_canvas(
                     for bi, bline in enumerate(boundaries):
                         fraction = bline / total_lines if total_lines > 0 else 0
                         est_rows = int(math.ceil(c_rows * fraction))
-                        est_box = box_rows(est_rows, pad_top(column), pad_bot(column))
+                        est_box = box_rows(
+                            est_rows, pad_top(column), pad_bot(column)
+                        )
                         if test_y + est_box <= max_y:
                             best_boundary = bi
                         else:
@@ -394,26 +439,26 @@ def generate_layout_canvas(
                             tex_path, boundaries, best_boundary
                         )
                         print(
-                            f"  Split {sec['content']} at boundary {best_boundary} "
-                            f"-> {p1_path.name}, {p2_path.name}"
+                            f"  Split {sec['content']} at boundary "
+                            f"{best_boundary} -> {p1_path.name}, {p2_path.name}"
                         )
 
                         current_y = test_y
                         placements.append(BoxPlacement(
                             title, str(p1_path.relative_to(ROOT)),
-                            column, current_page
+                            column, current_page, col_start_y, band_idx,
                         ))
 
-                        # Move to next page
                         current_page += 1
-                        current_y = start_y
+                        current_y = content_start_y
                         placements.append(BoxPlacement(
                             title + " (cont.)",
                             str(p2_path.relative_to(ROOT)),
-                            column, current_page
+                            column, current_page, content_start_y, band_idx,
                         ))
-                        # Estimate remainder height
-                        total_lines_f = float(total_lines) if total_lines > 0 else 1.0
+                        total_lines_f = (
+                            float(total_lines) if total_lines > 0 else 1.0
+                        )
                         remaining_fraction = 1.0 - (
                             boundaries[best_boundary] / total_lines_f
                         )
@@ -426,64 +471,152 @@ def generate_layout_canvas(
                         split_done = True
 
                 if not split_done:
-                    # Can't split — defer entire box to next page
                     current_page += 1
-                    current_y = start_y
+                    current_y = content_start_y
                     placements.append(BoxPlacement(
                         title, f"generated/{sec['content']}",
-                        column, current_page
+                        column, current_page, content_start_y, band_idx,
                     ))
                     current_y += b_rows
 
-        max_pg = max((p.page for p in placements), default=1)
-        return placements, max_pg
+        max_pg = max((p.page for p in placements), default=col_start_page)
+        return placements, max_pg, current_y
 
-    left_pl, left_max = layout_column(left_secs, "left")
-    right_pl, right_max = layout_column(right_secs, "right")
-    full_pl, full_max = layout_column(full_secs, "full")
+    # ------------------------------------------------------------------
+    # Lay out bands sequentially with a shared Y cursor
+    # ------------------------------------------------------------------
+    all_placements: list[BoxPlacement] = []
+    band_start_y = content_start_y
+    band_start_page = 1
 
-    total_pages = max(left_max, right_max, full_max)
+    for band_idx, band in enumerate(bands):
+        if "full" in band:
+            pl, max_pg, end_y = layout_column(
+                band["full"], "full",
+                band_start_y, band_start_page, band_idx,
+            )
+            all_placements.extend(pl)
+            band_start_page = max_pg
+            band_start_y = end_y
+        else:
+            left_secs = band.get("left", [])
+            right_secs = band.get("right", [])
 
-    # --- Generate canvas.tex ---
+            left_max_pg = band_start_page
+            left_end_y = band_start_y
+            right_max_pg = band_start_page
+            right_end_y = band_start_y
+
+            if left_secs:
+                pl, left_max_pg, left_end_y = layout_column(
+                    left_secs, "left",
+                    band_start_y, band_start_page, band_idx,
+                )
+                all_placements.extend(pl)
+
+            if right_secs:
+                pl, right_max_pg, right_end_y = layout_column(
+                    right_secs, "right",
+                    band_start_y, band_start_page, band_idx,
+                )
+                all_placements.extend(pl)
+
+            # Next band starts after whichever column reached further
+            if left_max_pg > right_max_pg:
+                band_start_page = left_max_pg
+                band_start_y = left_end_y
+            elif right_max_pg > left_max_pg:
+                band_start_page = right_max_pg
+                band_start_y = right_end_y
+            else:
+                band_start_page = left_max_pg
+                band_start_y = max(left_end_y, right_end_y)
+
+    total_pages = max(
+        (p.page for p in all_placements), default=1
+    )
+
+    # ------------------------------------------------------------------
+    # Generate canvas.tex — emit placements grouped by page and band
+    # ------------------------------------------------------------------
     out: list[str] = [_canvas_header(header_theme)]
 
     for page in range(1, total_pages + 1):
         _emit_page_header(out, page)
 
-        page_left = [p for p in left_pl if p.page == page]
-        if page_left:
-            out.append("% --- Left column ---")
+        page_placements = [p for p in all_placements if p.page == page]
+
+        # Group by band_idx to emit init commands per band
+        seen_bands: dict[int, dict] = {}
+        for pl in page_placements:
+            if pl.band_idx not in seen_bands:
+                seen_bands[pl.band_idx] = {}
+            band_cols = seen_bands[pl.band_idx]
+            if pl.column not in band_cols:
+                band_cols[pl.column] = []
+            band_cols[pl.column].append(pl)
+
+        has_left = False
+        has_right = False
+
+        for bi in sorted(seen_bands.keys()):
+            band_cols = seen_bands[bi]
+
+            if "left" in band_cols:
+                has_left = True
+                pls = band_cols["left"]
+                init_y = pls[0].init_y
+                out.append("% --- Left column ---")
+                if init_y == content_start_y:
+                    out.append(r"\LeftBoxInit{0}{\ContentStartY}")
+                else:
+                    out.append(f"\\LeftBoxInit{{0}}{{{int(init_y)}}}")
+                for i, pl in enumerate(pls):
+                    if i > 0:
+                        out.append(r"\LeftBoxGap{\GapBoxToBox}")
+                    out.append(
+                        f"\\LeftBox{{{pl.title}}}{{{pl.content_path}}}"
+                    )
+                out.append("")
+
+            if "right" in band_cols:
+                has_right = True
+                pls = band_cols["right"]
+                init_y = pls[0].init_y
+                out.append("% --- Right column ---")
+                if init_y == content_start_y:
+                    out.append(r"\RightBoxInit{\RightColX}{\ContentStartY}")
+                else:
+                    out.append(
+                        f"\\RightBoxInit{{\\RightColX}}{{{int(init_y)}}}"
+                    )
+                for i, pl in enumerate(pls):
+                    if i > 0:
+                        out.append(r"\RightBoxGap{\GapBoxToBox}")
+                    out.append(
+                        f"\\RightBox{{{pl.title}}}{{{pl.content_path}}}"
+                    )
+                out.append("")
+
+            if "full" in band_cols:
+                pls = band_cols["full"]
+                init_y = pls[0].init_y
+                out.append("% --- Full-width ---")
+                if init_y == content_start_y:
+                    out.append(r"\FullBoxInit{0}{\ContentStartY}")
+                else:
+                    out.append(f"\\FullBoxInit{{0}}{{{int(init_y)}}}")
+                for i, pl in enumerate(pls):
+                    if i > 0:
+                        out.append(r"\FullBoxGap{\GapBoxToBox}")
+                    out.append(
+                        f"\\FullBox{{{pl.title}}}{{{pl.content_path}}}"
+                    )
+                out.append("")
+
+        if not has_left and page > 1:
             out.append(r"\LeftBoxInit{0}{\ContentStartY}")
-            for i, pl in enumerate(page_left):
-                if i > 0:
-                    out.append(r"\LeftBoxGap{\GapBoxToBox}")
-                out.append(f"\\LeftBox{{{pl.title}}}{{{pl.content_path}}}")
-            out.append("")
-
-        page_right = [p for p in right_pl if p.page == page]
-        if page_right:
-            out.append("% --- Right column ---")
-            out.append(r"\RightBoxInit{\RightColX}{\ContentStartY}")
-            for i, pl in enumerate(page_right):
-                if i > 0:
-                    out.append(r"\RightBoxGap{\GapBoxToBox}")
-                out.append(f"\\RightBox{{{pl.title}}}{{{pl.content_path}}}")
-            out.append("")
-
-        page_full = [p for p in full_pl if p.page == page]
-        if page_full:
-            out.append("% --- Full-width ---")
-            out.append(r"\FullBoxInit{0}{\ContentStartY}")
-            for i, pl in enumerate(page_full):
-                if i > 0:
-                    out.append(r"\FullBoxGap{\GapBoxToBox}")
-                out.append(f"\\FullBox{{{pl.title}}}{{{pl.content_path}}}")
-            out.append("")
-
-        # Init cursors for columns with no boxes on this page (for reset)
-        if not page_left and page > 1:
-            out.append(r"\LeftBoxInit{0}{\ContentStartY}")
-        if not page_right and page > 1:
+        if not has_right and page > 1:
             out.append(r"\RightBoxInit{\RightColX}{\ContentStartY}")
         out.append("")
 
