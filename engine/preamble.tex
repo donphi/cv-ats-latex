@@ -98,9 +98,11 @@
 \newcommand{\ContentWidthScale}{1.0}      % no scaling — minipage width = available space
 
 % --- Step 1: cell size (from font metrics) ----------------------------------
-%     1 pt = 25.4 mm / 72 ≈ 0.35278 mm  (standard TeX PostScript point)
-%     We store this as \PtToMM so the conversion isn't a magic number.
-\newcommand{\PtToMM}{\fpeval{25.4 / 72}}% = 0.35277… mm per pt
+%     \fontspec loads fonts in TeX points:  1pt = 25.4mm / 72.27
+%     (NOT PostScript big-points where 1bp = 25.4mm / 72.)
+%     Using the correct TeX-pt conversion keeps the grid cell size
+%     exactly equal to the monospace advance width at \GridFontSize.
+\newcommand{\PtToMM}{\fpeval{25.4 / 72.27}}% = 0.35146… mm per TeX pt
 \newcommand{\CellWidth}{\fpeval{\GridFontSize * \MonoWidthRatio * \PtToMM}}
 \newcommand{\CellHeight}{\fpeval{\GridFontSize * \PtToMM}}
 
@@ -127,10 +129,13 @@
 %     We set \TPHorizModule and \TPVertModule directly instead of using
 %     \TPGrid, because \TPGrid with the 'absolute' option divides
 %     \paperwidth / cols (not drawable width), giving grid cells LARGER
-%     than our monospace characters. Setting modules directly ensures
-%     1 grid column = 1 character cell exactly.
-\TPHorizModule=\fpeval{\CellWidth} mm\relax
-\TPVertModule=\fpeval{\CellHeight} mm\relax
+%     than our monospace characters. Setting modules in pt (the native
+%     font unit) avoids any mm↔pt conversion rounding, so 1 grid column
+%     equals 1 monospace character cell exactly.
+\newcommand{\CellWidthPt}{\fpeval{\GridFontSize * \MonoWidthRatio}}%  pt
+\newcommand{\CellHeightPt}{\fpeval{\GridFontSize}}%                   pt
+\TPHorizModule=\CellWidthPt pt\relax
+\TPVertModule=\CellHeightPt pt\relax
 \textblockorigin{\MarginH mm}{\MarginV mm}% origin = top-left of snapped margins
 
 % --- Kill all default LaTeX spacing -----------------------------------------
